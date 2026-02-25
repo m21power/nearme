@@ -1,0 +1,57 @@
+import 'package:flutter/material.dart';
+import 'package:nearme/features/home/presentation/pages/home_page.dart';
+
+import 'custom_bottom_navbar.dart';
+
+class MainNavigationPage extends StatefulWidget {
+  const MainNavigationPage({super.key});
+
+  @override
+  State<MainNavigationPage> createState() => _MainNavigationPageState();
+}
+
+class _MainNavigationPageState extends State<MainNavigationPage> {
+  int currentIndex = 0;
+
+  final List<Widget> _screens = const [
+    HomePage(),
+    DummyPage(title: "Map Page"),
+    DummyPage(title: "Center Action Page"),
+    DummyPage(title: "Chat Page"),
+    DummyPage(title: "Profile Page"),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: true,
+      body: _screens[currentIndex],
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: currentIndex,
+        onTap: (i) {
+          setState(() => currentIndex = i);
+        },
+        onCenterTap: () {
+          setState(() => currentIndex = 2);
+        },
+      ),
+    );
+  }
+}
+
+class DummyPage extends StatelessWidget {
+  final String title;
+
+  const DummyPage({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(title: Text(title)),
+      body: Center(child: Text(title, style: theme.textTheme.headlineLarge)),
+    );
+  }
+}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearme/core/theme/dark_theme.dart';
 import 'package:nearme/core/theme/light_theme.dart';
+import 'package:nearme/features/home/presentation/pages/MainNavigationPage.dart';
+import 'package:nearme/features/home/presentation/pages/custom_bottom_navbar.dart';
 import 'package:nearme/features/home/presentation/pages/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -22,7 +24,7 @@ class MyApp extends StatelessWidget {
       darkTheme: AppDarkTheme.theme,
       themeMode: ThemeMode.system,
 
-      home: const HomePage(),
+      home: MainNavigationPage(),
     );
   }
 }
