@@ -140,7 +140,6 @@ Future<String?> uploadImageToCloudinary(File imageFile) async {
 
     final response = await request.send();
     final resBody = await response.stream.bytesToString();
-
     if (response.statusCode == 200) {
       final data = jsonDecode(resBody);
       return data['secure_url']; // public HTTPS URL

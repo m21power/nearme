@@ -7,6 +7,12 @@ import 'package:nearme/features/auth/domain/usecases/log_out_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nearme/features/home/data/home_repo_impl.dart';
+import 'package:nearme/features/home/domain/repository/home_repository.dart';
+import 'package:nearme/features/home/domain/usecases/create_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/fetch_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/like_post_usecase.dart';
+import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
 import 'package:nearme/features/profile/data/profile_repo_impl.dart';
 import 'package:nearme/features/profile/domain/repository/profile_repository.dart';
 import 'package:nearme/features/profile/domain/usecases/update_banner_image_usecase.dart';
@@ -86,6 +92,35 @@ Future<void> init() async {
       updateProfileImageUsecase: sl<UpdateProfileImageUsecase>(),
       updateBannerImageUsecase: sl<UpdateBannerImageUsecase>(),
       updateUserInfoUsecase: sl<UpdateUserInfoUsecase>(),
+    ),
+  );
+
+  // Home
+
+  // repository
+  sl.registerLazySingleton<HomeRepository>(
+    () => HomeRepoImpl(
+      firestore: sl<FirebaseFirestore>(),
+      sharedPreferences: sl<SharedPreferences>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+  // usecase
+  sl.registerLazySingleton<CreatePostUsecase>(
+    () => CreatePostUsecase(homeRepository: sl<HomeRepository>()),
+  );
+  sl.registerLazySingleton<FetchPostUsecase>(
+    () => FetchPostUsecase(homeRepository: sl<HomeRepository>()),
+  );
+  sl.registerLazySingleton<LikePostUsecase>(
+    () => LikePostUsecase(homeRepository: sl<HomeRepository>()),
+  );
+  // bloc
+  sl.registerFactory(
+    () => HomeBloc(
+      createPostUsecase: sl<CreatePostUsecase>(),
+      fetchPostUsecase: sl<FetchPostUsecase>(),
+      likePostUsecase: sl<LikePostUsecase>(),
     ),
   );
 }
