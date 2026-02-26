@@ -108,23 +108,7 @@ class HeaderSection extends StatelessWidget {
         ),
 
         const SizedBox(height: 20),
-        SizedBox(
-          height: 95,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: stories.length + 1,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return const MyStoryAvatar();
-              }
-
-              final story = stories[index - 1];
-
-              return StoryAvatar(story: story);
-            },
-          ),
-        ),
+        StoryWidget(stories: stories),
       ],
     );
   }

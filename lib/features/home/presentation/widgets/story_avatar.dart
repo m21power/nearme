@@ -4,9 +4,35 @@ import 'package:flutter/material.dart';
 
 import '../../domain/entities/post_model.dart';
 
+class StoryWidget extends StatelessWidget {
+  const StoryWidget({super.key, required this.stories});
+
+  final List<StoryModel> stories;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 95,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: stories.length + 1,
+        separatorBuilder: (_, __) => const SizedBox(width: 14),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return const MyStoryAvatar();
+          }
+
+          final story = stories[index - 1];
+
+          return StoryAvatar(story: story);
+        },
+      ),
+    );
+  }
+}
+
 class StoryAvatar extends StatelessWidget {
   final StoryModel story;
-
   const StoryAvatar({super.key, required this.story});
 
   @override
@@ -20,6 +46,8 @@ class StoryAvatar extends StatelessWidget {
     return Column(
       children: [
         Container(
+          width: 64, // ← fixed outer size
+          height: 64,
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -33,7 +61,7 @@ class StoryAvatar extends StatelessWidget {
                 : null,
           ),
           child: CircleAvatar(
-            radius: 28,
+            radius: 28, // stays 28
             backgroundImage: AssetImage(story.imageUrl),
           ),
         ),
@@ -62,22 +90,27 @@ class MyStoryAvatar extends StatelessWidget {
 
     return Column(
       children: [
-        Stack(
+        Container(
+          width: 64, // ← same outer size as others
+          height: 64,
           alignment: Alignment.center,
-          children: [
-            DashedCircle(
-              size: 70,
-              color: scheme.primary,
-              strokeWidth: 3,
-              dash: 8,
-              gap: 6,
-            ),
-            CircleAvatar(
-              radius: 25,
-              backgroundColor: scheme.surface,
-              child: Icon(Icons.add, color: scheme.primary),
-            ),
-          ],
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              DashedCircle(
+                size: 64, // reduced from 70
+                color: scheme.primary,
+                strokeWidth: 3,
+                dash: 8,
+                gap: 6,
+              ),
+              CircleAvatar(
+                radius: 25,
+                backgroundColor: scheme.surface,
+                child: Icon(Icons.add, color: scheme.primary),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 6),
         SizedBox(
