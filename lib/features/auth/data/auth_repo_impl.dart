@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nearme/core/constant/shared_preference_constant.dart';
+import 'package:nearme/core/constant/user_session.dart';
 import 'package:nearme/core/error/failure.dart';
 import 'package:nearme/core/network/network_info_impl.dart';
 import 'package:nearme/features/auth/domain/repository/auth_repository.dart';
@@ -23,6 +25,7 @@ class AuthRepoImpl implements AuthRepository {
   Future<Either<Failure, void>> checkLoginStatus() async {
     try {
       final isLoggedIn = sharedPreferences.getBool('isLoggedIn') ?? false;
+      await UserSession.instance.load();
       if (isLoggedIn) {
         return Right(null);
       } else {
@@ -43,6 +46,7 @@ class AuthRepoImpl implements AuthRepository {
         const Duration(seconds: 3),
       ); // Simulate network delay
       String otp = _generateOtp();
+      email = normalizeEmail(email);
 
       firestore.collection('OtpCollection').doc(email).set({
         'otp': "123456",
@@ -58,12 +62,27 @@ class AuthRepoImpl implements AuthRepository {
     }
   }
 
+  Map<String, dynamic> userToJson(Map<String, dynamic> user) {
+    final Map<String, dynamic> json = {};
+    user.forEach((key, value) {
+      if (value is Timestamp) {
+        json[key] = value.toDate().toIso8601String();
+      } else if (value == null) {
+        json[key] = null;
+      } else {
+        json[key] = value;
+      }
+    });
+    return json;
+  }
+
   @override
   Future<Either<Failure, void>> verifyOtp(String email, String otp) async {
     if (!await networkInfo.isConnected) {
       return Left(NetworkFailure(message: 'No internet connection'));
     }
     try {
+      email = normalizeEmail(email);
       final doc = await firestore.collection('OtpCollection').doc(email).get();
       if (!doc.exists) {
         return Left(AuthFailure(message: 'OTP not found for this email'));
@@ -77,7 +96,56 @@ class AuthRepoImpl implements AuthRepository {
           DateTime.now().difference(timestamp.toDate()).inMinutes > 15) {
         return Left(AuthFailure(message: 'OTP expired'));
       }
+      /*
+          String? userId;
+      String? name;
+      String? dept;
+      String? year;
+      String? bio;
+      String? profileImage;
+      String? bannerImage;
+      LatLng? location;
+      int? postCount;
+      int? connectionCount;
+      bool hasActiveStory = false;
+      DateTime? createdAt;
+      DateTime? lastActive;
+      */
+      // 1- check if a user exist at users/{email}
+      // 2- if not create a new user with default values
+      final userDoc = firestore.collection('users').doc(email);
+      final userSnapshot = await userDoc.get();
+      var user = {
+        'userId': email,
+        'name': email.split('@')[0],
+        'dept': '---',
+        'year': '---',
+        'bio': '----',
+        'profileImage': '',
+        'bannerImage': '',
+        'location': null,
+        'postCount': 0,
+        'connectionCount': 0,
+        'hasActiveStory': false,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastActive': FieldValue.serverTimestamp(),
+      };
+      if (!userSnapshot.exists) {
+        await userDoc.set(user);
+        await sharedPreferences.setString(
+          SharedPreferenceConstant.userKey,
+          jsonEncode(userToJson(user)),
+        );
+      } else {
+        final existingUserData = userSnapshot.data()!;
+        await sharedPreferences.setString(
+          SharedPreferenceConstant.userKey,
+          jsonEncode(userToJson(existingUserData)),
+        );
+      }
       await sharedPreferences.setBool('isLoggedIn', true);
+      await UserSession.instance.load();
+
       return Right(null);
     } catch (e) {
       return Left(AuthFailure(message: 'Error verifying OTP: $e'));
@@ -87,6 +155,7 @@ class AuthRepoImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await sharedPreferences.clear();
+    await UserSession.instance.clear();
     return Future.value();
   }
 }
@@ -155,4 +224,20 @@ Future<Either<Failure, void>> sendOtpFunc(String email, String otp) async {
   } else {
     return Left(AuthFailure(message: 'Failed to send OTP: ${response.body}'));
   }
+}
+
+String normalizeEmail(String email) {
+  final buffer = StringBuffer();
+
+  for (var i = 0; i < email.length; i++) {
+    final char = email[i];
+    // If it's a letter (A-Z or a-z), convert to lowercase
+    if (RegExp(r'[A-Za-z]').hasMatch(char)) {
+      buffer.write(char.toLowerCase());
+    } else {
+      buffer.write(char);
+    }
+  }
+
+  return buffer.toString();
 }

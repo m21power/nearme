@@ -8,7 +8,7 @@ import 'package:nearme/dependency_injection.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:nearme/splash_screen.dart';
+import 'package:nearme/features/profile/presentation/bloc/profile_bloc.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => sl<AuthBloc>()..add(AuthCheckLoginStatusEvent()),
         ),
+        BlocProvider(create: (_) => sl<ProfileBloc>()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

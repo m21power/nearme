@@ -7,6 +7,12 @@ import 'package:nearme/features/auth/domain/usecases/log_out_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nearme/features/profile/data/profile_repo_impl.dart';
+import 'package:nearme/features/profile/domain/repository/profile_repository.dart';
+import 'package:nearme/features/profile/domain/usecases/update_banner_image_usecase.dart';
+import 'package:nearme/features/profile/domain/usecases/update_profile_image_usecase.dart';
+import 'package:nearme/features/profile/domain/usecases/update_user_info_usecase.dart';
+import 'package:nearme/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -51,6 +57,35 @@ Future<void> init() async {
       sendOtpUsecase: sl<SendOtpUsecase>(),
       verifyOtpUsecase: sl<VerifyOtpUsecase>(),
       logOutUsecase: sl<LogOutUsecase>(),
+    ),
+  );
+
+  // Profile
+  //repository
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepoImpl(
+      firestore: sl<FirebaseFirestore>(),
+      sharedPreferences: sl<SharedPreferences>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+  // usecase
+  sl.registerLazySingleton<UpdateProfileImageUsecase>(
+    () => UpdateProfileImageUsecase(profileRepository: sl<ProfileRepository>()),
+  );
+  sl.registerLazySingleton<UpdateBannerImageUsecase>(
+    () => UpdateBannerImageUsecase(repository: sl<ProfileRepository>()),
+  );
+  sl.registerLazySingleton<UpdateUserInfoUsecase>(
+    () => UpdateUserInfoUsecase(profileRepository: sl<ProfileRepository>()),
+  );
+  // bloc
+
+  sl.registerFactory(
+    () => ProfileBloc(
+      updateProfileImageUsecase: sl<UpdateProfileImageUsecase>(),
+      updateBannerImageUsecase: sl<UpdateBannerImageUsecase>(),
+      updateUserInfoUsecase: sl<UpdateUserInfoUsecase>(),
     ),
   );
 }
