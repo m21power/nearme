@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearme/features/chat/presentation/pages/chat_page.dart';
 import 'package:nearme/features/home/presentation/pages/home_page.dart';
+import 'package:nearme/features/profile/presentation/pages/profile_page.dart';
 
 import 'custom_bottom_navbar.dart';
 
@@ -19,7 +20,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     DummyPage(title: "Map Page"),
     DummyPage(title: "Center Action Page"),
     MessagesPage(),
-    DummyPage(title: "Profile Page"),
+    ProfilePage(),
   ];
 
   @override
