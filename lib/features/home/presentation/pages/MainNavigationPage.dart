@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearme/features/chat/presentation/pages/chat_page.dart';
 import 'package:nearme/features/home/presentation/pages/create_post.dart';
 import 'package:nearme/features/home/presentation/pages/home_page.dart';
+import 'package:nearme/features/map/presentation/pages/map_page.dart';
 import 'package:nearme/features/profile/presentation/pages/profile_page.dart';
 
 import 'custom_bottom_navbar.dart';
@@ -18,7 +19,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   final List<Widget> _screens = const [
     HomePage(),
-    DummyPage(title: "Map Page"),
+    MapPage(),
     CreatePostPage(),
     MessagesPage(),
     ProfilePage(),
