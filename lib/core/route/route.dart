@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nearme/features/home/domain/entities/post_model.dart';
 import 'package:nearme/features/home/presentation/pages/MainNavigationPage.dart';
+import 'package:nearme/features/home/presentation/pages/post_detail_page.dart';
 import 'package:nearme/splash_screen.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../constant/route_constant.dart';
@@ -47,6 +49,14 @@ final GoRouter router = GoRouter(
       name: RouteConstant.mainNavigation,
       builder: (context, state) {
         return MainNavigationPage();
+      },
+    ),
+    GoRoute(
+      path: '/post-detail',
+      name: RouteConstant.postDetailPage,
+      builder: (context, state) {
+        final post = state.extra as PostModel;
+        return PostDetailPage(post: post);
       },
     ),
   ],

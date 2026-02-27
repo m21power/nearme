@@ -1,3 +1,5 @@
+import 'package:nearme/features/home/domain/entities/comment_model.dart';
+
 class PostModel {
   final bool isLiked;
   final String postId;

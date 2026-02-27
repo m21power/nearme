@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nearme/core/utils/loading_overlay.dart';
 import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
+import 'package:nearme/features/home/presentation/pages/post_detail_page.dart';
 
 import '../widgets/header_section.dart';
 import '../widgets/post_card.dart';
@@ -35,7 +36,7 @@ class HomePage extends StatelessWidget {
                         ...homeState.posts.map(
                           (post) => Padding(
                             padding: const EdgeInsets.only(bottom: 20),
-                            child: PostCard(post: post),
+                            child: PostCard(post: post, isDetailPage: false),
                           ),
                         ),
                     ],

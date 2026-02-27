@@ -18,7 +18,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   int currentIndex = 0;
 
   final List<Widget> _screens = const [
-    HomePage(),
+    HomeTabNavigator(),
     MapPage(),
     CreatePostPage(),
     MessagesPage(),
@@ -56,6 +56,19 @@ class DummyPage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(title: Text(title)),
       body: Center(child: Text(title, style: theme.textTheme.headlineLarge)),
+    );
+  }
+}
+
+class HomeTabNavigator extends StatelessWidget {
+  const HomeTabNavigator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Navigator(
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(builder: (_) => const HomePage());
+      },
     );
   }
 }

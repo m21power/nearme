@@ -91,11 +91,11 @@ class AuthRepoImpl implements AuthRepository {
       if (data == null || data['otp'] != otp) {
         return Left(AuthFailure(message: 'Invalid OTP'));
       }
-      final timestamp = data['timestamp'] as Timestamp?;
-      if (timestamp == null ||
-          DateTime.now().difference(timestamp.toDate()).inMinutes > 15) {
-        return Left(AuthFailure(message: 'OTP expired'));
-      }
+      // final timestamp = data['timestamp'] as Timestamp?;
+      // if (timestamp == null ||
+      //     DateTime.now().difference(timestamp.toDate()).inMinutes > 15) {
+      //   return Left(AuthFailure(message: 'OTP expired'));
+      // }
       /*
           String? userId;
       String? name;

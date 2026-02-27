@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nearme/core/constant/route_constant.dart';
 import 'package:nearme/core/constant/user_session.dart';
 import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
 
 import '../../../../core/utils/normalize_time.dart';
 import '../../domain/entities/post_model.dart';
+import '../pages/post_detail_page.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
+  final bool isDetailPage;
 
-  const PostCard({super.key, required this.post});
+  const PostCard({super.key, required this.post, required this.isDetailPage});
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +62,26 @@ class PostCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                UserSession.instance.userId == post.userId
-                    ? Icon(Icons.more_horiz, color: colorScheme.onSurface)
+                ((UserSession.instance.userId == post.userId ||
+                            UserSession.instance.userId ==
+                                dotenv.env['ADMIN_USERID']) &&
+                        isDetailPage)
+                    ? GestureDetector(
+                        onTap: () async {
+                          final shouldDelete = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => const DeletePostDialog(),
+                          );
+
+                          if (shouldDelete == true) {
+                            context.read<HomeBloc>().add(
+                              DeletePostEvent(postId: post.postId),
+                            );
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Icon(Icons.delete, color: colorScheme.error),
+                      )
                     : SizedBox.shrink(),
               ],
             ),
@@ -114,14 +137,71 @@ class PostCard extends StatelessWidget {
 
                 const SizedBox(width: 24),
 
-                Icon(Icons.chat_bubble_outline, color: colorScheme.onSurface),
-                const SizedBox(width: 6),
-                Text("${post.comments}", style: textTheme.bodyMedium),
+                // Icon(Icons.chat_bubble_outline, color: colorScheme.onSurface),
+                // const SizedBox(width: 6),
+                // Text("${post.comments}", style: textTheme.bodyMedium),
+                GestureDetector(
+                  onTap: () {
+                    context.read<HomeBloc>().add(
+                      FetchCommentsEvent(postId: post.postId),
+                    );
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => PostDetailPage(post: post),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        color: colorScheme.onSurface,
+                      ),
+                      const SizedBox(width: 6),
+                      Text("${post.comments}", style: textTheme.bodyMedium),
+                    ],
+                  ),
+                ),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class DeletePostDialog extends StatelessWidget {
+  const DeletePostDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: colorScheme.surface,
+      title: Text(
+        "Delete Post",
+        style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      content: Text(
+        "Are you sure you want to delete this post?",
+        style: textTheme.bodyMedium,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text("Cancel", style: textTheme.bodyMedium),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: colorScheme.error),
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text("Delete"),
+        ),
+      ],
     );
   }
 }

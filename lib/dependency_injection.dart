@@ -9,7 +9,11 @@ import 'package:nearme/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:nearme/features/home/data/home_repo_impl.dart';
 import 'package:nearme/features/home/domain/repository/home_repository.dart';
+import 'package:nearme/features/home/domain/usecases/comment_on_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/create_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/delete_comment_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/delete_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/fetch_comment_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/fetch_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/like_post_usecase.dart';
 import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
@@ -115,12 +119,28 @@ Future<void> init() async {
   sl.registerLazySingleton<LikePostUsecase>(
     () => LikePostUsecase(homeRepository: sl<HomeRepository>()),
   );
+  sl.registerLazySingleton<CommentOnPostUsecase>(
+    () => CommentOnPostUsecase(homeRepository: sl<HomeRepository>()),
+  );
+  sl.registerLazySingleton<FetchCommentUsecase>(
+    () => FetchCommentUsecase(homeRepository: sl<HomeRepository>()),
+  );
+  sl.registerLazySingleton<DeleteCommentUsecase>(
+    () => DeleteCommentUsecase(homeRepository: sl<HomeRepository>()),
+  );
+  sl.registerLazySingleton<DeletePostUsecase>(
+    () => DeletePostUsecase(homeRepository: sl<HomeRepository>()),
+  );
   // bloc
   sl.registerFactory(
     () => HomeBloc(
       createPostUsecase: sl<CreatePostUsecase>(),
       fetchPostUsecase: sl<FetchPostUsecase>(),
       likePostUsecase: sl<LikePostUsecase>(),
+      commentOnPostUsecase: sl<CommentOnPostUsecase>(),
+      fetchCommentsUsecase: sl<FetchCommentUsecase>(),
+      deleteCommentUsecase: sl<DeleteCommentUsecase>(),
+      deletePostUsecase: sl<DeletePostUsecase>(),
     ),
   );
 }
