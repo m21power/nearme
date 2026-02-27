@@ -16,4 +16,5 @@ abstract class HomeRepository {
   Future<void> deletePost(String postId);
 
   Future<void> deleteComment(String commentId);
+  Future<Either<Failure, List<PostModel>>> fetchMyPost();
 }

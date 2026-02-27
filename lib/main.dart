@@ -32,7 +32,11 @@ class MyApp extends StatelessWidget {
           create: (_) => sl<AuthBloc>()..add(AuthCheckLoginStatusEvent()),
         ),
         BlocProvider(create: (_) => sl<ProfileBloc>()),
-        BlocProvider(create: (_) => sl<HomeBloc>()..add(FetchPostsEvent())),
+        BlocProvider(
+          create: (_) => sl<HomeBloc>()
+            ..add(FetchPostsEvent())
+            ..add(FetchMyPostsEvent()),
+        ),
         BlocProvider(create: (_) => sl<StoryBloc>()..add(FetchStoriesEvent())),
       ],
       child: MaterialApp.router(

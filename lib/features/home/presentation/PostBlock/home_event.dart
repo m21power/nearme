@@ -61,3 +61,5 @@ class DeletePostEvent extends HomeEvent {
   @override
   List<Object> get props => [postId];
 }
+
+class FetchMyPostsEvent extends HomeEvent {}

@@ -5,6 +5,7 @@ import 'package:nearme/features/home/domain/usecases/Post/comment_on_post_usecas
 import 'package:nearme/features/home/domain/usecases/Post/create_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/delete_comment_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/delete_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/fetch_my_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/fetch_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/like_post_usecase.dart';
 
@@ -22,6 +23,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final FetchCommentUsecase fetchCommentsUsecase;
   final DeleteCommentUsecase deleteCommentUsecase;
   final DeletePostUsecase deletePostUsecase;
+  final FetchMyPostUsecase fetchMyPostUsecase;
   HomeBloc({
     required this.createPostUsecase,
     required this.fetchPostUsecase,
@@ -30,27 +32,39 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.fetchCommentsUsecase,
     required this.deleteCommentUsecase,
     required this.deletePostUsecase,
+    required this.fetchMyPostUsecase,
   }) : super(HomeInitial()) {
     on<CreatePostEvent>((event, emit) async {
-      emit(CreatePostLoading(posts: state.posts));
+      emit(CreatePostLoading(posts: state.posts, myPosts: state.myPosts));
       final result = await createPostUsecase(event.caption, event.imagePath);
+      add(FetchMyPostsEvent());
       result.fold(
-        (failure) =>
-            emit(HomeError(message: failure.message, posts: state.posts)),
+        (failure) => emit(
+          HomeError(
+            message: failure.message,
+            posts: state.posts,
+            myPosts: state.myPosts,
+          ),
+        ),
         (post) {
           final updatedPosts = List<PostModel>.from(state.posts)
             ..insert(0, post);
-          emit(PostCreatedState(posts: updatedPosts));
+          emit(PostCreatedState(posts: updatedPosts, myPosts: state.myPosts));
         },
       );
     });
     on<FetchPostsEvent>((event, emit) async {
-      emit(FetchPostsLoading(posts: state.posts));
+      emit(FetchPostsLoading(posts: state.posts, myPosts: state.myPosts));
       final result = await fetchPostUsecase();
       result.fold(
-        (failure) =>
-            emit(HomeError(message: failure.message, posts: state.posts)),
-        (posts) => emit(PostsFetched(posts: posts)),
+        (failure) => emit(
+          HomeError(
+            message: failure.message,
+            posts: state.posts,
+            myPosts: state.myPosts,
+          ),
+        ),
+        (posts) => emit(PostsFetched(posts: posts, myPosts: state.myPosts)),
       );
     });
 
@@ -69,7 +83,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }
           return post;
         }).toList();
-        emit(PostsFetched(posts: updatedPosts));
+        emit(PostsFetched(posts: updatedPosts, myPosts: currentState.myPosts));
         await likePostUsecase(event.postId);
       }
     });
@@ -80,6 +94,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         DisplayCommentSectionState(
           postId: event.postId,
           posts: currentState.posts,
+          myPosts: currentState.myPosts,
         ),
       );
     });
@@ -94,16 +109,27 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }
           return post;
         }).toList();
-        emit(PostsFetched(posts: updatedPosts));
+        emit(PostsFetched(posts: updatedPosts, myPosts: currentState.myPosts));
       }
     });
     on<FetchCommentsEvent>((event, emit) async {
-      emit(CommentLoadingState(postId: event.postId, posts: state.posts));
+      emit(
+        CommentLoadingState(
+          postId: event.postId,
+          posts: state.posts,
+          myPosts: state.myPosts,
+        ),
+      );
       final result = await fetchCommentsUsecase(event.postId);
 
       result.fold(
-        (failure) =>
-            emit(HomeError(message: failure.message, posts: state.posts)),
+        (failure) => emit(
+          HomeError(
+            message: failure.message,
+            posts: state.posts,
+            myPosts: state.myPosts,
+          ),
+        ),
         (comments) {
           final updatedCommentsByPost = Map<String, List<CommentModel>>.from(
             state.commentsByPost,
@@ -121,6 +147,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               posts: updatedPosts,
               commentsByPost: updatedCommentsByPost,
               timestamp: DateTime.now().toString(),
+              myPosts: state.myPosts,
             ),
           );
         },
@@ -133,6 +160,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<DeletePostEvent>((event, emit) async {
       await deletePostUsecase(event.postId);
       add(FetchPostsEvent());
+      add(FetchMyPostsEvent());
+    });
+
+    on<FetchMyPostsEvent>((event, emit) async {
+      emit(FetchMyPostsLoading(posts: state.posts, myPosts: state.myPosts));
+      final result = await fetchMyPostUsecase();
+      result.fold(
+        (failure) => emit(
+          HomeError(
+            message: failure.message,
+            posts: state.posts,
+            myPosts: state.myPosts,
+          ),
+        ),
+        (mypost) {
+          // mypost.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          print("***********************************************");
+          print("Fetched my posts: $mypost");
+          print("***********************************************");
+          emit(PostsFetched(posts: state.posts, myPosts: mypost));
+        },
+      );
     });
   }
 }

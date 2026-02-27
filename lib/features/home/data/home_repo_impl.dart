@@ -55,6 +55,14 @@ class HomeRepoImpl implements HomeRepository {
       });
       // then update the post with the generated id
       await postRef.update({"postId": postRef.id});
+      // thenupdate post count in user document
+      var userRef = firestore
+          .collection("users")
+          .doc(UserSession.instance.userId);
+      await userRef.update({"postCount": FieldValue.increment(1)});
+      UserSession.instance.postCount =
+          (UserSession.instance.postCount ?? 0) + 1;
+      UserSession.instance.save();
       return Right(
         PostModel(
           postId: postRef.id,
@@ -257,8 +265,63 @@ class HomeRepoImpl implements HomeRepository {
       }
       // Then delete the post itself
       await postRef.delete();
+      var userRef = firestore
+          .collection("users")
+          .doc(UserSession.instance.userId);
+      await userRef.update({"postCount": FieldValue.increment(-1)});
+      UserSession.instance.postCount =
+          (UserSession.instance.postCount ?? 1) - 1;
+      UserSession.instance.save();
     } catch (e) {
       print("Error deleting post: $e");
+    }
+  }
+
+  Future<Either<Failure, List<PostModel>>> fetchMyPost() async {
+    if (!await networkInfo.isConnected) {
+      return Left(NetworkFailure(message: "No internet connection"));
+    }
+
+    try {
+      final currentUserId = UserSession.instance.userId!;
+      final snapshot = await firestore
+          .collection("posts")
+          .where("authorId", isEqualTo: currentUserId)
+          .orderBy("createdAt", descending: true)
+          .get();
+
+      final posts = await Future.wait(
+        snapshot.docs.map((doc) async {
+          final data = doc.data() as Map<String, dynamic>? ?? {};
+
+          final likeDoc = await firestore
+              .collection("posts")
+              .doc(data["postId"])
+              .collection("likes")
+              .doc(currentUserId)
+              .get();
+
+          return PostModel(
+            isLiked: likeDoc.exists,
+            postId: data["postId"] ?? "",
+            userId: data["authorId"] ?? "",
+            userProfile: data["userProfilePic"] ?? "",
+            userName: data["username"] ?? "Unnamed User",
+            dept: data["dept"] ?? "---",
+            createdAt:
+                (data["createdAt"] as Timestamp?)?.toDate().toIso8601String() ??
+                "",
+            caption: data["caption"] ?? "",
+            imageUrl: data["imageUrl"] ?? "",
+            likes: data["likeCount"] ?? 0,
+            comments: data["commentCount"] ?? 0,
+          );
+        }),
+      );
+
+      return Right(posts);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 }

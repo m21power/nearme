@@ -15,6 +15,7 @@ import 'package:nearme/features/home/domain/usecases/Post/create_post_usecase.da
 import 'package:nearme/features/home/domain/usecases/Post/delete_comment_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/delete_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/fetch_comment_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/fetch_my_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/fetch_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/like_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Story/create_story_usecase.dart';
@@ -140,6 +141,9 @@ Future<void> init() async {
   sl.registerLazySingleton<DeletePostUsecase>(
     () => DeletePostUsecase(homeRepository: sl<HomeRepository>()),
   );
+  sl.registerLazySingleton<FetchMyPostUsecase>(
+    () => FetchMyPostUsecase(sl<HomeRepository>()),
+  );
   // bloc
   sl.registerFactory(
     () => HomeBloc(
@@ -150,6 +154,7 @@ Future<void> init() async {
       fetchCommentsUsecase: sl<FetchCommentUsecase>(),
       deleteCommentUsecase: sl<DeleteCommentUsecase>(),
       deletePostUsecase: sl<DeletePostUsecase>(),
+      fetchMyPostUsecase: sl<FetchMyPostUsecase>(),
     ),
   );
 
