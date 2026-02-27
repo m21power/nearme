@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:nearme/core/constant/user_session.dart';
 import 'package:nearme/core/utils/normalize_time.dart';
 import 'package:nearme/features/home/domain/entities/comment_model.dart';
+import 'package:nearme/features/home/presentation/widgets/Post/delete_dialog.dart';
 
 class CommentTile extends StatelessWidget {
   final CommentModel comment;
@@ -64,7 +65,8 @@ class CommentTile extends StatelessWidget {
                           onTap: () async {
                             final shouldDelete = await showDialog<bool>(
                               context: context,
-                              builder: (context) => const DeleteCommentDialog(),
+                              builder: (context) =>
+                                  const DeleteDialog(content: "Comment"),
                             );
 
                             if (shouldDelete == true) {
@@ -85,41 +87,6 @@ class CommentTile extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class DeleteCommentDialog extends StatelessWidget {
-  const DeleteCommentDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: colorScheme.surface,
-      title: Text(
-        "Delete Comment",
-        style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-      ),
-      content: Text(
-        "Are you sure you want to delete this comment?",
-        style: textTheme.bodyMedium,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text("Cancel", style: textTheme.bodyMedium),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: colorScheme.error),
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text("Delete"),
-        ),
-      ],
     );
   }
 }

@@ -4,11 +4,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nearme/core/constant/route_constant.dart';
 import 'package:nearme/core/constant/user_session.dart';
-import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
+import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
+import 'package:nearme/features/home/presentation/widgets/Post/delete_dialog.dart';
 
-import '../../../../core/utils/normalize_time.dart';
-import '../../domain/entities/post_model.dart';
-import '../pages/post_detail_page.dart';
+import '../../../../../core/utils/normalize_time.dart';
+import '../../../domain/entities/post_model.dart';
+import '../../pages/post_detail_page.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -70,7 +71,8 @@ class PostCard extends StatelessWidget {
                         onTap: () async {
                           final shouldDelete = await showDialog<bool>(
                             context: context,
-                            builder: (context) => const DeletePostDialog(),
+                            builder: (context) =>
+                                const DeleteDialog(content: "Post"),
                           );
 
                           if (shouldDelete == true) {
@@ -167,41 +169,6 @@ class PostCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class DeletePostDialog extends StatelessWidget {
-  const DeletePostDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: colorScheme.surface,
-      title: Text(
-        "Delete Post",
-        style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-      ),
-      content: Text(
-        "Are you sure you want to delete this post?",
-        style: textTheme.bodyMedium,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text("Cancel", style: textTheme.bodyMedium),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: colorScheme.error),
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text("Delete"),
-        ),
-      ],
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nearme/features/home/presentation/widgets/story_avatar.dart';
 
 import '../../../home/domain/entities/post_model.dart';
+import '../../../home/presentation/widgets/Story/story_widget.dart';
 import '../widgets/chat_tile.dart';
 
 class MessagesPage extends StatelessWidget {
@@ -11,64 +11,7 @@ class MessagesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final stories = [
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-      StoryModel(name: "Sarah J.", imageUrl: "assets/image.jpg", isSeen: false),
-      StoryModel(name: "Mike T.", imageUrl: "assets/image.jpg", isSeen: true),
-      StoryModel(
-        name: "Design Club",
-        imageUrl: "assets/image.jpg",
-        isSeen: false,
-      ),
-    ];
+    List<StoryModel> stories = [];
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -111,8 +54,7 @@ class MessagesPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               /// STORIES ROW
-              StoryWidget(stories: stories),
-
+              // StoryWidget(stories: stories),
               const SizedBox(height: 10),
 
               /// CHAT LIST

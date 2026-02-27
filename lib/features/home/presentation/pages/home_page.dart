@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nearme/core/utils/loading_overlay.dart';
-import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
-import 'package:nearme/features/home/presentation/pages/post_detail_page.dart';
+import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
+import 'package:nearme/features/home/presentation/StoryBlock/story_bloc.dart';
 
-import '../widgets/header_section.dart';
-import '../widgets/post_card.dart';
+import '../widgets/Post/header_section.dart';
+import '../widgets/Post/post_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -20,6 +20,7 @@ class HomePage extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () async {
             context.read<HomeBloc>().add(FetchPostsEvent());
+            context.read<StoryBloc>().add(FetchStoriesEvent());
           },
           child: Scaffold(
             body: SafeArea(
@@ -29,7 +30,12 @@ class HomePage extends StatelessWidget {
                   ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      HeaderSection(),
+                      BlocBuilder<StoryBloc, StoryState>(
+                        builder: (context, storyState) {
+                          print("Story State in Home Page: $storyState");
+                          return HeaderSection(storyState: storyState);
+                        },
+                      ),
                       const SizedBox(height: 24),
 
                       if (homeState.posts.isNotEmpty)

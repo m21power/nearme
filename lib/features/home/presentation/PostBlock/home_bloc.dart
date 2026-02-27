@@ -1,15 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:nearme/features/home/domain/entities/post_model.dart';
-import 'package:nearme/features/home/domain/usecases/comment_on_post_usecase.dart';
-import 'package:nearme/features/home/domain/usecases/create_post_usecase.dart';
-import 'package:nearme/features/home/domain/usecases/delete_comment_usecase.dart';
-import 'package:nearme/features/home/domain/usecases/delete_post_usecase.dart';
-import 'package:nearme/features/home/domain/usecases/fetch_post_usecase.dart';
-import 'package:nearme/features/home/domain/usecases/like_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/comment_on_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/create_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/delete_comment_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/delete_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/fetch_post_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/Post/like_post_usecase.dart';
 
 import '../../domain/entities/comment_model.dart';
-import '../../domain/usecases/fetch_comment_usecase.dart';
+import '../../domain/usecases/Post/fetch_comment_usecase.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';

@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nearme/core/constant/pick_image.dart';
 import 'package:nearme/core/constant/route_constant.dart';
 import 'package:nearme/core/utils/loading_overlay.dart';
-import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
+import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
 
 import '../../../../core/constant/user_session.dart';
 

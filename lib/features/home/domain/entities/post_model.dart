@@ -57,13 +57,77 @@ class PostModel {
 }
 
 class StoryModel {
-  final String name;
-  final String imageUrl;
+  final String storyId;
+  final String authorId;
+  final String authorUrl;
+  final String authorName;
+  final String mediaUrl;
+  final String caption;
+  final String createdAt;
+  final String expiresAt;
+  final int viewerCount;
+  final int likeCount;
   final bool isSeen;
+  final bool isLiked;
 
   StoryModel({
-    required this.name,
-    required this.imageUrl,
+    required this.storyId,
+    required this.authorId,
+    required this.mediaUrl,
+    required this.caption,
+    required this.createdAt,
+    required this.expiresAt,
+    required this.viewerCount,
+    required this.likeCount,
+    required this.authorName,
+    required this.authorUrl,
     required this.isSeen,
+    required this.isLiked,
+  });
+
+  StoryModel copyWith({
+    String? storyId,
+    String? authorId,
+    String? mediaUrl,
+    String? caption,
+    String? createdAt,
+    String? expiresAt,
+    int? viewerCount,
+    int? likeCount,
+    String? authorName,
+    String? authorUrl,
+    bool? isSeen,
+    bool? isLiked,
+  }) {
+    return StoryModel(
+      storyId: storyId ?? this.storyId,
+      authorId: authorId ?? this.authorId,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
+      caption: caption ?? this.caption,
+      createdAt: createdAt ?? this.createdAt,
+      expiresAt: expiresAt ?? this.expiresAt,
+      viewerCount: viewerCount ?? this.viewerCount,
+      likeCount: likeCount ?? this.likeCount,
+      authorName: authorName ?? this.authorName,
+      authorUrl: authorUrl ?? this.authorUrl,
+      isSeen: isSeen ?? this.isSeen,
+      isLiked: isLiked ?? this.isLiked,
+    );
+  }
+}
+
+class ViewerModel {
+  final String viewerId;
+  final String viewerName;
+  final String viewerProfileUrl;
+  final String seenAt;
+  final bool isLiked;
+
+  ViewerModel({
+    required this.viewerId,
+    required this.viewerName,
+    required this.viewerProfileUrl,
+    required this.seenAt,
+    required this.isLiked,
   });
 }

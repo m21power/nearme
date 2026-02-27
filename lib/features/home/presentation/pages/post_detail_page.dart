@@ -4,10 +4,10 @@ import 'package:nearme/core/constant/user_session.dart';
 import 'package:nearme/core/utils/normalize_time.dart';
 import 'package:nearme/features/home/domain/entities/comment_model.dart';
 import 'package:nearme/features/home/domain/entities/post_model.dart';
-import 'package:nearme/features/home/presentation/bloc/home_bloc.dart';
-import 'package:nearme/features/home/presentation/widgets/comment_input.dart';
-import 'package:nearme/features/home/presentation/widgets/comment_tile.dart';
-import 'package:nearme/features/home/presentation/widgets/post_card.dart';
+import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
+import 'package:nearme/features/home/presentation/widgets/Post/comment_input.dart';
+import 'package:nearme/features/home/presentation/widgets/Post/comment_tile.dart';
+import 'package:nearme/features/home/presentation/widgets/Post/post_card.dart';
 
 class PostDetailPage extends StatefulWidget {
   PostModel post;
