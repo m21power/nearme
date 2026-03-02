@@ -7,8 +7,10 @@ import 'package:nearme/features/auth/domain/usecases/log_out_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nearme/features/home/data/connection_repo_impl.dart';
 import 'package:nearme/features/home/data/home_repo_impl.dart';
 import 'package:nearme/features/home/data/story_repo_impl.dart';
+import 'package:nearme/features/home/domain/repository/connection_repository.dart';
 import 'package:nearme/features/home/domain/repository/home_repository.dart';
 import 'package:nearme/features/home/domain/usecases/Post/comment_on_post_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Post/create_post_usecase.dart';
@@ -24,6 +26,13 @@ import 'package:nearme/features/home/domain/usecases/Story/fetch_story_usecase.d
 import 'package:nearme/features/home/domain/usecases/Story/fetch_viewer_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Story/like_story_usecase.dart';
 import 'package:nearme/features/home/domain/usecases/Story/view_story_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/connection/get_connection_request_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/connection/get_connection_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/connection/get_suggestion_user_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/connection/read_connection_request_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/connection/respond_to_connection_request_usecase.dart';
+import 'package:nearme/features/home/domain/usecases/connection/send_connection_request_usecase.dart';
+import 'package:nearme/features/home/presentation/ConnectionBlock/connection_bloc.dart';
 import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
 import 'package:nearme/features/home/presentation/StoryBlock/story_bloc.dart';
 import 'package:nearme/features/profile/data/profile_repo_impl.dart';
@@ -196,6 +205,60 @@ Future<void> init() async {
       fetchStoryUsecase: sl<FetchStoryUsecase>(),
       fetchViewerUsecase: sl<FetchViewerUseCase>(),
       likeStoryUsecase: sl<LikeStoryUsecase>(),
+    ),
+  );
+
+  // Connections
+
+  // repository
+  sl.registerLazySingleton<ConnectionRepository>(
+    () => ConnectionRepoImpl(
+      sharedPreferences: sl<SharedPreferences>(),
+      firestore: sl<FirebaseFirestore>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+
+  // usecase
+  sl.registerLazySingleton<GetSuggestionUserUsecase>(
+    () => GetSuggestionUserUsecase(
+      connectionRepository: sl<ConnectionRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<SendConnectionRequestUsecase>(
+    () => SendConnectionRequestUsecase(
+      connectionRepository: sl<ConnectionRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<StreamConnectionRequestUsecase>(
+    () => StreamConnectionRequestUsecase(
+      connectionRepository: sl<ConnectionRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<ReadConnectionRequestUsecase>(
+    () => ReadConnectionRequestUsecase(
+      connectionRepository: sl<ConnectionRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<RespondToConnectionRequestUsecase>(
+    () => RespondToConnectionRequestUsecase(
+      connectionRepository: sl<ConnectionRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<GetConnectionUsecase>(
+    () =>
+        GetConnectionUsecase(connectionRepository: sl<ConnectionRepository>()),
+  );
+  // Bloc
+  sl.registerFactory(
+    () => ConnectionBloc(
+      getSuggestionUserUsecase: sl<GetSuggestionUserUsecase>(),
+      sendConnectionRequestUsecase: sl<SendConnectionRequestUsecase>(),
+      streamConnectionRequestUsecase: sl<StreamConnectionRequestUsecase>(),
+      readConnectionRequestUsecase: sl<ReadConnectionRequestUsecase>(),
+      respondToConnectionRequestUsecase:
+          sl<RespondToConnectionRequestUsecase>(),
+      getConnectionUsecase: sl<GetConnectionUsecase>(),
     ),
   );
 }

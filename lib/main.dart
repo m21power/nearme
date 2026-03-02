@@ -8,6 +8,7 @@ import 'package:nearme/dependency_injection.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nearme/features/home/presentation/ConnectionBlock/connection_bloc.dart';
 import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
 import 'package:nearme/features/home/presentation/StoryBlock/story_bloc.dart';
 import 'package:nearme/features/profile/presentation/bloc/profile_bloc.dart';
@@ -38,6 +39,12 @@ class MyApp extends StatelessWidget {
             ..add(FetchMyPostsEvent()),
         ),
         BlocProvider(create: (_) => sl<StoryBloc>()..add(FetchStoriesEvent())),
+        BlocProvider(
+          create: (_) => sl<ConnectionBloc>()
+            ..add(LoadConnectionSuggestionsEvent())
+            ..add(LoadConnectionRequestsEvent())
+            ..add(LoadConnectionsEvent()),
+        ),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
