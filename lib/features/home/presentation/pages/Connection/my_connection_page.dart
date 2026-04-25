@@ -75,6 +75,9 @@ class _MyConnectionsPageState extends State<MyConnectionsPage>
                       context.read<ConnectionBloc>().add(
                         LoadConnectionSuggestionsEvent(),
                       );
+                      context.read<ConnectionBloc>().add(
+                        LoadConnectionsEvent(),
+                      );
                     },
                     child: buildRequests(theme, conState),
                   ),
@@ -86,6 +89,9 @@ class _MyConnectionsPageState extends State<MyConnectionsPage>
                       );
                       context.read<ConnectionBloc>().add(
                         LoadConnectionSuggestionsEvent(),
+                      );
+                      context.read<ConnectionBloc>().add(
+                        LoadConnectionsEvent(),
                       );
                     },
                     child: buildConnected(theme, conState),

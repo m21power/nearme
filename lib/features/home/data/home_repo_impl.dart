@@ -318,7 +318,7 @@ class HomeRepoImpl implements HomeRepository {
           );
         }),
       );
-
+      print("Fetched ${posts.length} posts for current user");
       return Right(posts);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));

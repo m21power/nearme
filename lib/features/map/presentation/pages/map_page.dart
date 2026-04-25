@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:nearme/core/constant/user_session.dart';
+import 'package:nearme/features/map/presentation/bloc/map_bloc.dart';
+
+import '../../domain/entities/map_user.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -41,22 +47,121 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildMap(),
+    return BlocBuilder<MapBloc, MapState>(
+      builder: (context, mapState) {
+        if (mapState.isLocationEnabled) {
+          context.read<MapBloc>().add(UpdateUserLocationEvent());
+        }
+        print("**********************************************************");
+        print("Location Enabled: ${mapState.isLocationEnabled}");
+        print(mapState);
+        print("**********************************************************");
+        return Scaffold(
+          body: Stack(
+            children: [
+              _buildMap(mapState),
 
-          if (selectedUser != null) _buildUserCard(selectedUser!),
-        ],
-      ),
+              if (selectedUser != null) _buildUserCard(selectedUser!),
+
+              if (!mapState.isLocationEnabled)
+                Positioned(
+                  top: 40,
+                  left: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFF6B6B), Color(0xFFFF3B3B)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        /// Location Icon
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        /// Text
+                        Expanded(
+                          child: Text(
+                            "Enable location to discover people near you 📍",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        /// Enable Button
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.redAccent,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          onPressed: () async {
+                            await Geolocator.openLocationSettings();
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(Icons.my_location, size: 16),
+                              SizedBox(width: 6),
+                              Text(
+                                "Enable",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildMap() {
+  Widget _buildMap(MapState mapState) {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
-        initialCenter: fourKilo,
+        initialCenter: mapState.currentLocation,
         initialZoom: 17,
         onTap: (_, __) => setState(() => selectedUser = null),
       ),
@@ -66,10 +171,49 @@ class _MapPageState extends State<MapPage> {
               "https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${dotenv.env['MAP_KEY']}",
           userAgentPackageName: 'com.example.nearme',
         ),
+        MarkerLayer(
+          markers: [
+            /// USER LOCATION MARKER
+            Marker(
+              point: mapState.currentLocation,
+              width: 80,
+              height: 80,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primary,
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 12,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.4),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  backgroundImage:
+                      (UserSession.instance.profileImage != null &&
+                          UserSession.instance.profileImage!.isNotEmpty)
+                      ? NetworkImage(UserSession.instance.profileImage!)
+                      : null,
+                  child:
+                      (UserSession.instance.profileImage != null &&
+                          UserSession.instance.profileImage!.isNotEmpty)
+                      ? null
+                      : Icon(Icons.person, color: Colors.white, size: 28),
+                ),
+              ),
+            ),
+          ],
+        ),
 
         /// REAL MARKERS
         MarkerLayer(
-          markers: users.map((user) {
+          markers: mapState.nearbyUsers.map((user) {
             final isSelected = selectedUser?.id == user.id;
 
             return Marker(
@@ -237,24 +381,4 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
-}
-
-class MapUser {
-  final String id;
-  final String name;
-  final String avatar;
-  final bool isConnected;
-  final String major;
-  final String year;
-  final LatLng locationInfo;
-
-  MapUser({
-    required this.id,
-    required this.name,
-    required this.avatar,
-    required this.isConnected,
-    required this.major,
-    required this.year,
-    required this.locationInfo,
-  });
 }

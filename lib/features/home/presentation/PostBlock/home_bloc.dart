@@ -176,9 +176,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         (mypost) {
           // mypost.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          print("***********************************************");
-          print("Fetched my posts: $mypost");
-          print("***********************************************");
+
           emit(PostsFetched(posts: state.posts, myPosts: mypost));
         },
       );

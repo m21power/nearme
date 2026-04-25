@@ -27,3 +27,8 @@ String formatTimeAgo(String dateString) {
   // More than 7 days → show date with time
   return DateFormat("MMM d, h:mm a").format(dateTime);
 }
+
+String formatTimeOnly(String dateString) {
+  final dateTime = DateTime.parse(dateString);
+  return DateFormat("h:mm a").format(dateTime);
+}

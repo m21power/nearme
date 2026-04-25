@@ -21,7 +21,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     HomeTabNavigator(),
     MapPage(),
     CreatePostPage(),
-    MessagesPage(),
+    ChatPage(),
     ProfilePage(),
   ];
 

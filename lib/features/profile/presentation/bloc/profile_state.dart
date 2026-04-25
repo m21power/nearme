@@ -28,3 +28,12 @@ class ProfileError extends ProfileState {
 class ProfileInfoUpdatingState extends ProfileState {}
 
 class ProfileInfoUpdated extends ProfileState {}
+
+class FetchingUserPostsState extends ProfileState {}
+
+class UserPostsFetchedState extends ProfileState {
+  final UserInfoModel userInfo;
+  const UserPostsFetchedState({required this.userInfo});
+  @override
+  List<Object> get props => [userInfo];
+}

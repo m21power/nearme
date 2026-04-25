@@ -1,5 +1,48 @@
 import 'package:nearme/features/home/domain/entities/comment_model.dart';
 
+class UserModel {
+  // User fields
+  String userId;
+  String name;
+  String dept;
+  String year;
+  String bio;
+  String profileImage;
+  String bannerImage;
+  // LatLng location;
+  int postCount;
+  int connectionCount;
+  // bool hasActiveStory = false;
+  DateTime createdAt;
+  // DateTime lastActive;
+  UserModel({
+    required this.userId,
+    required this.name,
+    required this.dept,
+    required this.year,
+    required this.bio,
+    required this.profileImage,
+    required this.bannerImage,
+    // required this.location,
+    required this.postCount,
+    required this.connectionCount,
+    // this.hasActiveStory = false,
+    required this.createdAt,
+    // required this.lastActive,
+  });
+}
+
+class UserInfoModel {
+  final UserModel userModel;
+  final List<PostModel> userPosts;
+  final bool isConnected;
+  UserInfoModel({
+    required this.userModel,
+    required this.userPosts,
+    required this.isConnected,
+  });
+}
+
 class PostModel {
   final bool isLiked;
   final String postId;

@@ -244,7 +244,9 @@ class ConnectionRepoImpl implements ConnectionRepository {
           ),
         );
       }
-
+      print(
+        'Fetched ${connections.length} connections for user $currentUserId',
+      );
       return Right(connections);
     } catch (e) {
       print('Error fetching connections: $e');

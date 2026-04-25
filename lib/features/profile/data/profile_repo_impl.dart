@@ -13,6 +13,8 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 
+import '../../home/domain/entities/post_model.dart';
+
 class ProfileRepoImpl implements ProfileRepository {
   final FirebaseFirestore firestore;
   final SharedPreferences sharedPreferences;
@@ -107,6 +109,83 @@ class ProfileRepoImpl implements ProfileRepository {
       }
     } else {
       return Left(NetworkFailure(message: "No internet connection"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserInfoModel>> fetchUserPosts(String userId) async {
+    if (!await networkInfo.isConnected) {
+      return Left(NetworkFailure(message: "No internet connection"));
+    }
+
+    try {
+      final snapshot = await firestore
+          .collection("posts")
+          .where("authorId", isEqualTo: userId)
+          .orderBy("createdAt", descending: true)
+          .get();
+
+      final posts = await Future.wait(
+        snapshot.docs.map((doc) async {
+          final data = doc.data() as Map<String, dynamic>? ?? {};
+
+          final likeDoc = await firestore
+              .collection("posts")
+              .doc(data["postId"])
+              .collection("likes")
+              .doc(UserSession.instance.userId!)
+              .get();
+
+          return PostModel(
+            isLiked: likeDoc.exists,
+            postId: data["postId"] ?? "",
+            userId: data["authorId"] ?? "",
+            userProfile: data["userProfilePic"] ?? "",
+            userName: data["username"] ?? "Unnamed User",
+            dept: data["dept"] ?? "---",
+            createdAt:
+                (data["createdAt"] as Timestamp?)?.toDate().toIso8601String() ??
+                "",
+            caption: data["caption"] ?? "",
+            imageUrl: data["imageUrl"] ?? "",
+            likes: data["likeCount"] ?? 0,
+            comments: data["commentCount"] ?? 0,
+          );
+        }),
+      );
+
+      final userDoc = await firestore.collection("users").doc(userId).get();
+      final userData = userDoc.data() ?? {};
+      final userModel = UserModel(
+        userId: userData["userId"] ?? "",
+        name: userData["name"] ?? "Unnamed User",
+        dept: userData["dept"] ?? "---",
+        year: userData["year"] ?? "---",
+        bio: userData["bio"] ?? "",
+        profileImage: userData["profileImage"] ?? "",
+        bannerImage: userData["bannerImage"] ?? "",
+        postCount: userData["postCount"] ?? 0,
+        connectionCount: userData["connectionCount"] ?? 0,
+        createdAt:
+            (userData["createdAt"] as Timestamp?)?.toDate() ?? DateTime.now(),
+      );
+      final connectionList = [UserSession.instance.userId!, userId]..sort();
+      final connectionId = connectionList.join("_");
+
+      final connectionDoc = await firestore
+          .collection("connections")
+          .doc(connectionId)
+          .get();
+      final isConnected = connectionDoc.exists;
+      return Right(
+        UserInfoModel(
+          userModel: userModel,
+          userPosts: posts,
+          isConnected: isConnected,
+        ),
+      );
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 }

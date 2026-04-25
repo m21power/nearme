@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:get_it/get_it.dart' as get_it;
 import 'package:nearme/features/auth/data/auth_repo_impl.dart';
 import 'package:nearme/features/auth/domain/repository/auth_repository.dart';
@@ -7,6 +9,13 @@ import 'package:nearme/features/auth/domain/usecases/log_out_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:nearme/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:nearme/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nearme/features/chat/data/repository/chat_repo_impl.dart';
+import 'package:nearme/features/chat/domain/repository/chat_repository.dart';
+import 'package:nearme/features/chat/domain/usecases/get_chat_message_usecase.dart';
+import 'package:nearme/features/chat/domain/usecases/get_user_chats_usecase.dart';
+import 'package:nearme/features/chat/domain/usecases/mark_as_read_usecase.dart';
+import 'package:nearme/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:nearme/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:nearme/features/home/data/connection_repo_impl.dart';
 import 'package:nearme/features/home/data/home_repo_impl.dart';
 import 'package:nearme/features/home/data/story_repo_impl.dart';
@@ -35,8 +44,20 @@ import 'package:nearme/features/home/domain/usecases/connection/send_connection_
 import 'package:nearme/features/home/presentation/ConnectionBlock/connection_bloc.dart';
 import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
 import 'package:nearme/features/home/presentation/StoryBlock/story_bloc.dart';
+import 'package:nearme/features/map/data/map_repo_impl.dart';
+import 'package:nearme/features/map/domain/repository/map_repository.dart';
+import 'package:nearme/features/map/domain/usecases/get_nearby_users_usecase.dart';
+import 'package:nearme/features/map/domain/usecases/listen_to_location_status_usecase.dart';
+import 'package:nearme/features/map/domain/usecases/update_user_location_usecase.dart';
+import 'package:nearme/features/map/presentation/bloc/map_bloc.dart';
+import 'package:nearme/features/notification/data/notification_repo_impl.dart';
+import 'package:nearme/features/notification/domain/repository/notification_repository.dart';
+import 'package:nearme/features/notification/domain/usecases/listen_notification_usecase.dart';
+import 'package:nearme/features/notification/domain/usecases/mark_noti_as_read_usecase.dart';
+import 'package:nearme/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:nearme/features/profile/data/profile_repo_impl.dart';
 import 'package:nearme/features/profile/domain/repository/profile_repository.dart';
+import 'package:nearme/features/profile/domain/usecases/fetch_user_post_usecase.dart';
 import 'package:nearme/features/profile/domain/usecases/update_banner_image_usecase.dart';
 import 'package:nearme/features/profile/domain/usecases/update_profile_image_usecase.dart';
 import 'package:nearme/features/profile/domain/usecases/update_user_info_usecase.dart';
@@ -57,6 +78,7 @@ Future<void> init() async {
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferencesInstance);
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
   sl.registerLazySingleton<http.Client>(() => http.Client());
+  sl.registerLazySingleton<FirebaseDatabase>(() => FirebaseDatabase.instance);
 
   // repository
   sl.registerLazySingleton<AuthRepository>(
@@ -108,6 +130,9 @@ Future<void> init() async {
   sl.registerLazySingleton<UpdateUserInfoUsecase>(
     () => UpdateUserInfoUsecase(profileRepository: sl<ProfileRepository>()),
   );
+  sl.registerLazySingleton<FetchUserPostUsecase>(
+    () => FetchUserPostUsecase(profileRepository: sl<ProfileRepository>()),
+  );
   // bloc
 
   sl.registerFactory(
@@ -115,6 +140,7 @@ Future<void> init() async {
       updateProfileImageUsecase: sl<UpdateProfileImageUsecase>(),
       updateBannerImageUsecase: sl<UpdateBannerImageUsecase>(),
       updateUserInfoUsecase: sl<UpdateUserInfoUsecase>(),
+      fetchUserPostUsecase: sl<FetchUserPostUsecase>(),
     ),
   );
 
@@ -259,6 +285,90 @@ Future<void> init() async {
       respondToConnectionRequestUsecase:
           sl<RespondToConnectionRequestUsecase>(),
       getConnectionUsecase: sl<GetConnectionUsecase>(),
+    ),
+  );
+
+  // Chat
+  // repository
+  sl.registerLazySingleton<ChatRepository>(
+    () => ChatRepoImpl(
+      sharedPreferences: sl<SharedPreferences>(),
+      firestore: sl<FirebaseFirestore>(),
+      networkInfo: sl<NetworkInfo>(),
+      firebaseDatabase: sl<FirebaseDatabase>(),
+    ),
+  );
+
+  // usecase
+  sl.registerLazySingleton<GetUserChatsUsecase>(
+    () => GetUserChatsUsecase(chatRepository: sl<ChatRepository>()),
+  );
+  sl.registerLazySingleton<SendMessageUsecase>(
+    () => SendMessageUsecase(chatRepository: sl<ChatRepository>()),
+  );
+  sl.registerLazySingleton<GetChatMessageUsecase>(
+    () => GetChatMessageUsecase(chatRepository: sl<ChatRepository>()),
+  );
+  sl.registerLazySingleton<MarkAsReadUsecase>(
+    () => MarkAsReadUsecase(repository: sl<ChatRepository>()),
+  );
+
+  // Bloc
+  sl.registerFactory(
+    () => ChatBloc(
+      getUserChatsUsecase: sl<GetUserChatsUsecase>(),
+      sendMessageUsecase: sl<SendMessageUsecase>(),
+      getChatMessagesUsecase: sl<GetChatMessageUsecase>(),
+      markAsReadUsecase: sl<MarkAsReadUsecase>(),
+    ),
+  );
+
+  // Map
+  // repository
+  sl.registerLazySingleton<MapRepository>(
+    () => MapRepoImpl(
+      firestore: sl<FirebaseFirestore>(),
+      networkInfo: sl<NetworkInfo>(),
+      firebaseDatabase: sl<FirebaseDatabase>(),
+    ),
+  );
+  // usecase
+  sl.registerLazySingleton<ListenToLocationStatusUsecase>(
+    () => ListenToLocationStatusUsecase(mapRepository: sl<MapRepository>()),
+  );
+  sl.registerLazySingleton<UpdateUserLocationUsecase>(
+    () => UpdateUserLocationUsecase(mapRepository: sl<MapRepository>()),
+  );
+  sl.registerLazySingleton<GetNearbyUsersUsecase>(
+    () => GetNearbyUsersUsecase(mapRepository: sl<MapRepository>()),
+  );
+  // Bloc
+  sl.registerFactory(
+    () => MapBloc(
+      listenToLocationStatusUsecase: sl<ListenToLocationStatusUsecase>(),
+      updateUserLocationUsecase: sl<UpdateUserLocationUsecase>(),
+      getNearbyUsersUsecase: sl<GetNearbyUsersUsecase>(),
+    ),
+  );
+
+  // NOTIFICATION
+  // repository
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepoImpl(firestore: sl<FirebaseFirestore>()),
+  );
+  // usecase
+  sl.registerLazySingleton<MarkNotiAsReadUsecase>(
+    () => MarkNotiAsReadUsecase(repository: sl<NotificationRepository>()),
+  );
+  sl.registerLazySingleton<ListenNotificationUsecase>(
+    () => ListenNotificationUsecase(repository: sl<NotificationRepository>()),
+  );
+
+  // Bloc
+  sl.registerFactory(
+    () => NotificationBloc(
+      listenNotificationUsecase: sl(),
+      markNotiAsReadUsecase: sl(),
     ),
   );
 }

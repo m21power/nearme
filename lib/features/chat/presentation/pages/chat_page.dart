@@ -1,236 +1,130 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nearme/core/constant/user_session.dart';
+import 'package:nearme/core/utils/normalize_time.dart';
+import 'package:nearme/features/chat/domain/entities/chat_model.dart';
+import 'package:nearme/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:nearme/features/chat/presentation/pages/message_page.dart';
 
-import '../../../home/domain/entities/post_model.dart';
 import '../../../home/presentation/StoryBlock/story_bloc.dart';
 import '../../../home/presentation/widgets/Story/story_widget.dart';
 import '../widgets/chat_tile.dart';
 
-class MessagesPage extends StatelessWidget {
-  const MessagesPage({super.key});
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    List<StoryModel> stories = [];
     return BlocConsumer<StoryBloc, StoryState>(
       listener: (context, storyState) {
         // TODO: implement listener
       },
       builder: (context, storyState) {
-        return Scaffold(
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
+        return BlocConsumer<ChatBloc, ChatState>(
+          listener: (context, chatState) {
+            // TODO: implement listener
+          },
+          builder: (context, chatState) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<ChatBloc>().add(LoadUserChatsEvent());
+              },
+              child: Scaffold(
+                body: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
 
-                  /// HEADER
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Messages", style: theme.textTheme.headlineLarge),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: colors.surface,
-                          shape: BoxShape.circle,
+                        /// HEADER
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Messages",
+                              style: theme.textTheme.headlineLarge,
+                            ),
+                          ],
                         ),
-                        child: Icon(
-                          Icons.edit_square,
-                          color: colors.primary,
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                  /// SEARCH
-                  TextField(
-                    decoration: const InputDecoration(
-                      hintText: "Search messages...",
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                  ),
+                        /// SEARCH
+                        TextField(
+                          decoration: const InputDecoration(
+                            hintText: "Search messages...",
+                            prefixIcon: Icon(Icons.search),
+                          ),
+                        ),
 
-                  const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                  /// STORIES ROW
-                  StoryWidget(storyState: storyState),
-                  const SizedBox(height: 10),
+                        /// STORIES ROW
+                        StoryWidget(storyState: storyState),
+                        const SizedBox(height: 10),
 
-                  /// CHAT LIST
-                  Expanded(
-                    child: ListView(
-                      children: const [
-                        ChatTile(
-                          name: "Jessica M.",
-                          message: "Are you going to the mixer tonight?",
-                          time: "10:42 AM",
-                          unreadCount: 2,
-                          isOnline: true,
-                        ),
-                        ChatTile(
-                          name: "Study Group 101",
-                          message: "David: I shared the notes in the drive.",
-                          time: "Yesterday",
-                        ),
-                        ChatTile(
-                          name: "Alex Chen",
-                          message: "Can you send me the prof's email?",
-                          time: "Tue",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Sarah W.",
-                          message: "Thanks for the help!",
-                          time: "Mon",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Football Club",
-                          message: "Practice moved to 5 PM.",
-                          time: "Sun",
-                        ),
-                        ChatTile(
-                          name: "Mark",
-                          message: "Let's catch up soon.",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Emily",
-                          message: "Is the library open late today?",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Jessica M.",
-                          message: "Are you going to the mixer tonight?",
-                          time: "10:42 AM",
-                          unreadCount: 2,
-                          isOnline: true,
-                        ),
-                        ChatTile(
-                          name: "Study Group 101",
-                          message: "David: I shared the notes in the drive.",
-                          time: "Yesterday",
-                        ),
-                        ChatTile(
-                          name: "Alex Chen",
-                          message: "Can you send me the prof's email?",
-                          time: "Tue",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Sarah W.",
-                          message: "Thanks for the help!",
-                          time: "Mon",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Football Club",
-                          message: "Practice moved to 5 PM.",
-                          time: "Sun",
-                        ),
-                        ChatTile(
-                          name: "Mark",
-                          message: "Let's catch up soon.",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Emily",
-                          message: "Is the library open late today?",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Jessica M.",
-                          message: "Are you going to the mixer tonight?",
-                          time: "10:42 AM",
-                          unreadCount: 2,
-                          isOnline: true,
-                        ),
-                        ChatTile(
-                          name: "Study Group 101",
-                          message: "David: I shared the notes in the drive.",
-                          time: "Yesterday",
-                        ),
-                        ChatTile(
-                          name: "Alex Chen",
-                          message: "Can you send me the prof's email?",
-                          time: "Tue",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Sarah W.",
-                          message: "Thanks for the help!",
-                          time: "Mon",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Football Club",
-                          message: "Practice moved to 5 PM.",
-                          time: "Sun",
-                        ),
-                        ChatTile(
-                          name: "Mark",
-                          message: "Let's catch up soon.",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Emily",
-                          message: "Is the library open late today?",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Jessica M.",
-                          message: "Are you going to the mixer tonight?",
-                          time: "10:42 AM",
-                          unreadCount: 2,
-                          isOnline: true,
-                        ),
-                        ChatTile(
-                          name: "Study Group 101",
-                          message: "David: I shared the notes in the drive.",
-                          time: "Yesterday",
-                        ),
-                        ChatTile(
-                          name: "Alex Chen",
-                          message: "Can you send me the prof's email?",
-                          time: "Tue",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Sarah W.",
-                          message: "Thanks for the help!",
-                          time: "Mon",
-                          isSent: true,
-                        ),
-                        ChatTile(
-                          name: "Football Club",
-                          message: "Practice moved to 5 PM.",
-                          time: "Sun",
-                        ),
-                        ChatTile(
-                          name: "Mark",
-                          message: "Let's catch up soon.",
-                          time: "Last week",
-                        ),
-                        ChatTile(
-                          name: "Emily",
-                          message: "Is the library open late today?",
-                          time: "Last week",
+                        /// CHAT LIST
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: chatState.chats.length,
+                            itemBuilder: (context, index) {
+                              ChatModel chat = chatState.chats[index];
+                              final otherUserId = chat.users.firstWhere(
+                                (id) => id != UserSession.instance.userId,
+                              );
+                              return GestureDetector(
+                                onTap: () {
+                                  context.read<ChatBloc>().add(
+                                    LoadChatMessagesEvent(chatId: chat.chatId),
+                                  );
+                                  context.read<ChatBloc>().add(
+                                    MarkMessagesReadEvent(chatId: chat.chatId),
+                                  );
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          MessagePage(chatId: chat.chatId),
+                                    ),
+                                  );
+                                  print(chat.userProfilePics);
+                                  print(chat.userNames);
+                                  print(chat.unreadCounts);
+                                },
+                                child: ChatTile(
+                                  profilePic:
+                                      chat.userProfilePics[otherUserId] ?? "",
+
+                                  name:
+                                      chat.userNames[otherUserId] ?? "Unknown",
+                                  message: chat.lastMessage,
+                                  time: formatTimeAgo(
+                                    chat.lastMessageAt.toIso8601String(),
+                                  ),
+                                  unreadCount:
+                                      chat.unreadCounts[UserSession
+                                          .instance
+                                          .userId] ??
+                                      0,
+                                  isOnline:
+                                      chat.userOnlineStatus[otherUserId] ??
+                                      false,
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

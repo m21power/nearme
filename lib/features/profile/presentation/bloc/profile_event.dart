@@ -27,3 +27,10 @@ class UpdateProfileInfoEvent extends ProfileEvent {
   @override
   List<Object> get props => [userinfo];
 }
+
+class FetchUserPostsEvent extends ProfileEvent {
+  final String userId;
+  const FetchUserPostsEvent({required this.userId});
+  @override
+  List<Object> get props => [userId];
+}

@@ -131,14 +131,16 @@ class ConnectionBloc extends Bloc<ConnectionEvent, ConnectionStates> {
       );
       final result = await getConnectionUsecase();
       result.fold(
-        (failure) => emit(
-          ConnectionErrorState(
-            message: failure.message,
-            suggestions: state.suggestions,
-            requests: state.requests,
-            connectedUser: state.connectedUser,
-          ),
-        ),
+        (failure) {
+          emit(
+            ConnectionErrorState(
+              message: failure.message,
+              suggestions: state.suggestions,
+              requests: state.requests,
+              connectedUser: state.connectedUser,
+            ),
+          );
+        },
         (connections) => emit(
           ConnectionLoadedState(
             suggestions: state.suggestions,

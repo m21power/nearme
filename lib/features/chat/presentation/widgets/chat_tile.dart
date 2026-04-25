@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ChatTile extends StatelessWidget {
+  final String profilePic;
   final String name;
   final String message;
   final String time;
@@ -9,6 +10,7 @@ class ChatTile extends StatelessWidget {
   final bool isSent;
 
   const ChatTile({
+    required this.profilePic,
     required this.name,
     required this.message,
     required this.time,
@@ -32,6 +34,9 @@ class ChatTile extends StatelessWidget {
               CircleAvatar(
                 radius: 26,
                 backgroundColor: colors.surface,
+                backgroundImage: profilePic.isNotEmpty
+                    ? NetworkImage(profilePic)
+                    : null,
                 child: Text(name[0], style: theme.textTheme.bodyLarge),
               ),
               if (isOnline)
@@ -43,6 +48,23 @@ class ChatTile extends StatelessWidget {
                     height: 12,
                     decoration: BoxDecoration(
                       color: Colors.green,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: theme.scaffoldBackgroundColor,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: theme.scaffoldBackgroundColor,
