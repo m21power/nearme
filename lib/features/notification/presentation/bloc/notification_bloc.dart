@@ -51,7 +51,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       final latest = notifications.first;
 
       // 👇 detect ONLY new notification
-      if (_lastNotiId != latest.id) {
+      if (_lastNotiId != latest.id && !latest.isRead) {
         _lastNotiId = latest.id;
 
         NotificationService.showSimpleNotification(

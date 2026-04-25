@@ -176,18 +176,17 @@ class _StoryViewerState extends State<StoryViewer> {
                               ),
                               child: Row(
                                 children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _controller,
-                                      style: textTheme.bodyLarge,
-                                      decoration: InputDecoration(
-                                        hintText: 'Add a comment...',
-                                        border: InputBorder.none,
-                                      ),
-                                      onChanged: (_) => setState(() {}),
-                                    ),
-                                  ),
-
+                                  // Expanded(
+                                  //   child: TextField(
+                                  //     controller: _controller,
+                                  //     style: textTheme.bodyLarge,
+                                  //     decoration: InputDecoration(
+                                  //       hintText: 'Add a comment...',
+                                  //       border: InputBorder.none,
+                                  //     ),
+                                  //     onChanged: (_) => setState(() {}),
+                                  //   ),
+                                  // ),
                                   if (_controller.text.isNotEmpty)
                                     IconButton(
                                       icon: Icon(
