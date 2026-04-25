@@ -14,6 +14,7 @@ import 'package:nearme/features/home/presentation/ConnectionBlock/connection_blo
 import 'package:nearme/features/home/presentation/PostBlock/home_bloc.dart';
 import 'package:nearme/features/home/presentation/StoryBlock/story_bloc.dart';
 import 'package:nearme/features/map/presentation/bloc/map_bloc.dart';
+import 'package:nearme/features/notification/data/notification_service.dart';
 import 'package:nearme/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:nearme/features/profile/presentation/bloc/profile_bloc.dart';
 import 'firebase_options.dart';
@@ -22,6 +23,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseDatabase.instance.setPersistenceEnabled(true);
+  await NotificationService.init();
+
   await dotenv.load(fileName: ".env");
 
   await init();

@@ -4,6 +4,7 @@ import 'package:nearme/features/notification/presentation/bloc/notification_bloc
 import 'package:nearme/features/profile/presentation/pages/user_profile_page.dart';
 
 import '../../../home/presentation/pages/Connection/my_connection_page.dart';
+import '../../data/notification_service.dart';
 
 class NotificationPage extends StatefulWidget {
   NotificationPage({super.key});
@@ -114,6 +115,11 @@ class _NotificationPageState extends State<NotificationPage> {
                         print(
                           "Tapped notification: ${item['title']} - ${item['type']}",
                         );
+                        // NotificationService.showSimpleNotification(
+                        //   id: 0,
+                        //   title: "NearMe Campus",
+                        //   body: "You have a new notification",
+                        // );
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) =>
